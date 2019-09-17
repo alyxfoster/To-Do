@@ -19,10 +19,13 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        tasks = makeTasks()
         
         GroupTable.dataSource = self
         GroupTable.delegate = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        getTasks()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -42,32 +45,24 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
         performSegue(withIdentifier: "completeSegue", sender: tasks[indexPath.row])
     }
 
-    func makeTasks() -> [Task] {
-        let task1 = Task()
-        task1.name = "Complete App"
-        let task2 = Task()
-        task2.name = "Build Website"
-        task2.priority = true
-        let task3 = Task()
-        task3.name = "Grocery Shopping"
-        
-        return [task1, task2, task3]
-    }
-
     @IBAction func plusTapped(_ sender: Any) {
         performSegue(withIdentifier: "addSegue", sender: nil)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "addSegue" {
-            let nextVC = segue.destination as! CreateTaskViewController
-            nextVC.prevVC = self
-        }
-        
         if segue.identifier == "completeSegue" {
             let nextVC = segue.destination as! CompleteTaskViewController
             nextVC.task = sender as! Task
             nextVC.prevVC = self
+        }
+    }
+    
+    func getTasks() {
+        let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        do {
+            tasks = try context.fetch(Task.fetchRequest())
+        } catch {
+            print("ERROR THROWN")
         }
     }
 }
