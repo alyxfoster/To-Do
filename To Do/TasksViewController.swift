@@ -14,8 +14,6 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     var tasks : [Task] = []
     
-    var selectedIndex = 0
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -26,6 +24,7 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     
     override func viewWillAppear(_ animated: Bool) {
         getTasks()
+        GroupTable.reloadData()
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -35,13 +34,12 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         let task = tasks[indexPath.row]
-        if(task.priority) {cell.textLabel?.text = "!!! \(task.name)"}
-        else {cell.textLabel?.text = task.name}
+        if(task.priority) {cell.textLabel?.text = "!!! \(task.name!)"}
+        else {cell.textLabel?.text = task.name!}
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedIndex = indexPath.row
         performSegue(withIdentifier: "completeSegue", sender: tasks[indexPath.row])
     }
 
@@ -52,8 +50,7 @@ class TasksViewController: UIViewController, UITableViewDelegate, UITableViewDat
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "completeSegue" {
             let nextVC = segue.destination as! CompleteTaskViewController
-            nextVC.task = sender as! Task
-            nextVC.prevVC = self
+            nextVC.task = sender as? Task
         }
     }
     
